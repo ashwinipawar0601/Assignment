@@ -1,22 +1,25 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { Typography } from '@material-ui/core';
+import React from "react";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import { Typography } from "@material-ui/core";
+
+import { newTodo } from "../ducks/todos";
+import { connect } from "react-redux";
 
 const styles = theme => ({
   container: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap"
   },
   textField: {
     marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-  },
+    marginRight: theme.spacing.unit
+  }
 });
-export default class TodoApp extends React.Component {
+class TodoApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { items: [], text: '', DateOfCreation: '' };
+    this.state = { items: [], text: "", DateOfCreation: "" };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -37,6 +40,7 @@ export default class TodoApp extends React.Component {
 
           <button color="primary">Add #{this.state.items.length + 1}</button>
         </form>
+        <TodoListWithConnect />
       </div>
     );
   }
@@ -53,27 +57,47 @@ export default class TodoApp extends React.Component {
     const newItem = {
       text: this.state.text,
       id: Date.now(),
-      DateOfCreation: this.state.DateOfCreation,
+      DateOfCreation: this.state.DateOfCreation
     };
-    this.setState(state => ({
-      items: state.items.concat(newItem),
-      text: '',
-    }));
+
+    this.props.newTodo(newItem);
+
+    // this.setState(state => ({
+    //   items: state.items.concat(newItem),
+    //   text: '',
+    // }));
   }
 }
 
-export class TodoList extends React.Component {
+export default connect(
+  null,
+  { newTodo }
+)(TodoApp);
+
+class TodoList extends React.Component {
   render() {
-    return (
-      <ul>
-        {this.props.items.map(item => (
-          <li key={item.id}>
-            <Typography variant="subtitle2">
-              {item.text} {item.DateOfCreation}
-            </Typography>
-          </li>
-        ))}
-      </ul>
-    );
+    console.log("todolist", this.props.todos);
+
+    if (this.props.todos) {
+      return (
+        <ul>
+          {this.props.todos.todos.map(item => (
+            <li key={item.id}>
+              <Typography variant="subtitle2">
+                {item.text} {item.DateOfCreation}
+              </Typography>
+            </li>
+          ))}
+        </ul>
+      );
+    } else return null;
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    todos: state.todos
+  };
+};
+
+export const TodoListWithConnect = connect(mapStateToProps)(TodoList);
