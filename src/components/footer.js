@@ -4,8 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import GoogleAuth from './GoogleAuth';
+
 const styles = {
   root: {
     flexGrow: 1,
@@ -13,27 +12,40 @@ const styles = {
   grow: {
     flexGrow: 1,
   },
+  appBar: {
+    top: 'auto',
+    bottom: 0,
+  },
+  paper: {
+    paddingBottom: 50,
+  },
+  fabButton: {
+    position: 'absolute',
+    zIndex: 1,
+    top: -30,
+    left: 0,
+    right: 0,
+    margin: '0 auto',
+  },
 };
 
-const Headers = props => {
+const footer = props => {
   const { classes } = props;
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" color="inherit" className={classes.grow}>
-            ToDoList
+            Footer
           </Typography>
-
-          <GoogleAuth />
         </Toolbar>
       </AppBar>
     </div>
   );
 };
 
-Headers.propTypes = {
+footer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Headers);
+export default withStyles(styles)(footer);

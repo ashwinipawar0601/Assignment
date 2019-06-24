@@ -4,7 +4,7 @@ import Header from './Header';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { Link } from '@material-ui/core';
 import welcome from './welcome';
-
+import Footer from './footer';
 class App extends Component {
   render() {
     return (
