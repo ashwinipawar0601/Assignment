@@ -5,8 +5,9 @@ import { Typography, Checkbox } from '@material-ui/core';
 import Axios from 'axios';
 import { newTodo, selectedItem, deleteTodo } from '../ducks/todos';
 import { connect } from 'react-redux';
-import todo from './todo';
-
+import { Link } from 'react-router-dom';
+import EditTodo from './editTodo';
+import { isTSEnumMember } from '@babel/types';
 const styles = theme => ({
   container: {
     display: 'flex',
@@ -37,16 +38,23 @@ class TodoApp extends React.Component {
     return (
       <div>
         <h3>TODO</h3>
+        <Button component={Link} to="/new">
+          Add Todo
+        </Button>
         <TodoList items={this.state.items} />
         <form onSubmit={this.handleSubmit}>
           <label htmlFor="new-todo">What needs to be done?</label>
           <input
+            type="text"
+            ref={input => (this.getText = input)}
             id="new-todo"
             onChange={this.handleChange}
             value={this.state.text}
           />
 
-          <button color="primary">Add #{this.state.items.length + 1}</button>
+          <button color="primary" variant="contained">
+            Add #{this.state.items.length + 1}
+          </button>
         </form>
         <TodoListWithConnect />
       </div>
@@ -54,22 +62,34 @@ class TodoApp extends React.Component {
   }
 
   handleChange(e) {
-    this.setState({ text: e.target.value, DateOfCreation: Date.now() });
+    this.setState({
+      text: e.target.value,
+      DateOfCreation: this.calculateDate(),
+    });
   }
+  calculateDate = () => {
+    const DateOfCreate = Date.now();
+
+    // const newdate = new Date(parseInt(DateOfCreate));
+    //return newdate;
+    return DateOfCreate;
+  };
 
   handleSubmit(e) {
     e.preventDefault();
+    this.getText.value = '';
     if (!this.state.text.length) {
       return;
     }
     const newItem = {
       text: this.state.text,
-      id: Date.now(),
+      id: Date.now(), //Date.now(),
       DateOfCreation: this.state.DateOfCreation,
+      editing: false,
     };
-    // Axios.post('http://localhost:3004/todos', newItem).then(res =>
-    //  console.log(res.data)
-    // );
+    Axios.post('http://localhost:3004/todos', newItem).then(res =>
+      console.log(res.data)
+    );
 
     // const todoComponent = ({props.todos, deleteTodo})
 
@@ -80,20 +100,12 @@ class TodoApp extends React.Component {
     //   text: '',
     // }));
   }
-  deleteTodos(e, id) {
-    Axios.delete('http://localhost:3004/todos', id).then(res =>
-      console.log(res.data)
-    );
-
-    console.log(id);
-    e.preventDefault();
-    this.props.deleteTodo(id);
-  }
 }
 
 const mapDispatchToProps = {
   newTodo,
   deleteTodo,
+  selectedItem,
 };
 
 export default connect(
@@ -115,20 +127,44 @@ class TodoList extends React.Component {
               </Typography>
               <Checkbox
                 //checked={this.props.checkedA}
-                onClick={() => selectedItem(item.id)}
+                onChange={e => this.selectedItem(e, item.id)}
                 // value="checkedA"
                 inputProps={{
                   'aria-label': 'primary checkbox',
                 }}
               />
-              <Button onClick={e => this.deleteTodos(e, item.id)}>
-                Remove
-              </Button>
+
+              <Button onClick={e => this.updateTodo(e, item.id)}>Update</Button>
+
+              <Button onClick={e => this.deleteTodo(e, item.id)}>Delete</Button>
             </li>
           ))}
         </ul>
       );
     } else return null;
+  }
+
+  updateTodo(e, id) {
+    Axios.put('http://localhost:3004/todos/' + id).then(res => {
+      console.log(res.data);
+    });
+  }
+
+  selectedItem(e, id) {
+    let isChecked = e.target.checked;
+    console.log(isChecked);
+    this.props.selectedItem(id);
+  }
+
+  deleteTodo(e, id) {
+    Axios.delete('http://localhost:3004/todos/' + id).then(res => {
+      console.log(res.data);
+    });
+
+    console.log(id);
+    console.log('Deleted Todo successfully');
+    e.preventDefault();
+    // this.props.deleteTodo(id);
   }
 
   handleSelect(e) {

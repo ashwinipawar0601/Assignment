@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { signIn, signOut } from '../actions';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
+import TodoApp from './TodoApp';
 class GoogleAuth extends React.Component {
   state = { isSignedIn: null };
 
@@ -42,7 +43,12 @@ class GoogleAuth extends React.Component {
     } else if (this.state.isSignedIn) {
       return (
         <div>
-          <Button component={Link} to="/new">
+          <Button
+            variant="contained"
+            color="primary"
+            component={Link}
+            to="/new"
+          >
             Add Todo
           </Button>
           <Button
@@ -57,7 +63,13 @@ class GoogleAuth extends React.Component {
     } else {
       return (
         <div>
-          <Button onClick={this.onSignInClick}>SignIn</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.onSignInClick}
+          >
+            SignIn
+          </Button>
           <Link to="/" />
         </div>
       );
